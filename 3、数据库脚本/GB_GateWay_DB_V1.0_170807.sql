@@ -13,6 +13,7 @@ create database gb_gateway_db;
 /*==============================================================*/
 /* Table: gw_version_info_tbl                                */
 /*==============================================================*/
+use gb_gateway_db;
 create table gw_version_info_tbl
 (
    iID                  int not null comment '网关编号',
@@ -27,9 +28,10 @@ alter table gw_version_info_tbl comment '网关基本信息';
 
 
 /*==============================================================*/
-/* Table: user_Tbl                                                  */
+/* Table: user_Tbl                                              */
 /*==============================================================*/
-create table user_Tbl
+use gb_gateway_db;
+create table user_tbl
 (
    iID                  int not null comment '用户编号',
    cUserName            varchar(40) not null comment '用户名',
@@ -127,8 +129,9 @@ alter table up_gb_platform_tbl comment '上级国标平台参数';
 
 
 /*==============================================================*/
-/* Table: down_gb_platform_tbl                               */
+/* Table: down_gb_platform_tbl                                  */
 /*==============================================================*/
+use gb_gateway_db;
 create table down_gb_platform_tbl
 (
    cGBID                varchar(20)  not null comment '下级国标编号',
@@ -139,25 +142,42 @@ create table down_gb_platform_tbl
    cPlatformVersion     varchar(40) not null comment '平台版本',
    iOnLine              int not null  default 0 comment '是否在线：0 - 异常, 1 - 在线',
    cAccessDateTime      timestamp not null   comment '下级国标平台最近一次接入时间',
-   primary key (ID)
+   primary key (cGBID)
 );
 
 alter table down_gb_platform_tbl comment '下级国标平台参数';
 
 
 
+/*==============================================================*/
+/* Table: device_info_tbl                                       */
+/*==============================================================*/
+use gb_gateway_db;
 create table device_info_tbl
 (
    device_gbid   		varchar(20) not null comment '设备国标编号',
    device_source        int  not null  default 0 comment '设备来源  0 - 本机配置  1 - 下级推送',
    device_type          int  not null  default 132 comment '设备类型' , 
    device_name          varchar(128)   comment '设备名称',
-   
-
-
-
+   device_manufact      varchar(32)    comment '设备厂商',
+   device_model         varchar(64)    comment '设备型号',
+   device_owner         varchar(64)    comment '设备归属',
+   device_civilcode     varchar(20)    comment '行政区域',
+   device_block         varchar(22)    comment '警区',
+   device_address       varchar(128)   comment '安装地点',
+   device_parental      int            comment '是否有子设备 1--有 0--没有',
+   device_parentid      varchar(20)    comment '父设备/区域/系统ID',
+   device_safetyway     int            comment '信令安全模式',
+   device_registerway   int            comment '注册方式',
+   device_secrecy       int            comment '保密属性 0--不涉密，1--涉密',
+   device_ipv4          varchar(15)    comment '设备/区域/系统ip地址',
+   device_port          int            comment '设备/区域/系统端口',
+   device_password      varchar(20)    comment '设备口令',
+   device_status        int            comment '设备状态  0--不在线， 1--在线',
+   device_longitude     double         comment '设备经度',
+   device_latitude      double         comment '设备维度',
+   PRIMARY KEY  (device_gbid)
 );
 
+alter table device_info_tbl comment '设备参数信息表';
 
-
--- 
