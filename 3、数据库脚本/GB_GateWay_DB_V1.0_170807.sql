@@ -16,12 +16,12 @@ create database gb_gateway_db;
 use gb_gateway_db;
 create table gw_version_info_tbl
 (
-   iID                  int not null comment '网关编号',
-   iType                int  not null comment '类型',
-   cSystemVersion       varchar(40) comment '网关系统版本',
-   tBuildDate           timestamp comment '网关构建时间',
-   cDetails             varchar(100) comment '网关详细信息',
-   cCopyright           varchar(100) comment '网关版权信息',
+   iID                  int  not null  comment '网关编号',
+   iType                int  not null  comment '类型',
+   cSystemVersion       varchar(40)    comment '网关系统版本',
+   tBuildDate           timestamp      comment '网关构建时间',
+   cDetails             varchar(100)   comment '网关详细信息',
+   cCopyright           varchar(100)   comment '网关版权信息',
    
 );
 alter table gw_version_info_tbl comment '网关基本信息';
@@ -33,15 +33,15 @@ alter table gw_version_info_tbl comment '网关基本信息';
 use gb_gateway_db;
 create table user_tbl
 (
-   iID                  int not null comment '用户编号',
+   iID                  int         not null comment '用户编号',
    cUserName            varchar(40) not null comment '用户名',
    cName                varchar(40) not null comment '用户真实姓名',
    cPassword            varchar(40) not null comment '用户密码',
-   cUserRole            integer not null default 0 comment '用户角色',
+   cUserRole            integer     not null default 0 comment '用户角色',
    cUserAuthorization   varchar(40) not null comment '用户权限',
    cPartment            varchar(100) not null comment '用户所属部门',
-   cIP                  varchar(40) not null comment '用户最近一次登录IP',
-   tLoginDateTime       timestamp not null comment '用户最近一次登录时间',
+   cIP                  varchar(40)  not null comment '用户最近一次登录IP',
+   tLoginDateTime       timestamp    not null comment '用户最近一次登录时间',
    primary key (iID)
 );
 
@@ -60,8 +60,7 @@ create table local_gb_tbl
    cIP                  varchar(40) not null comment '网关IP地址',
    idownPort            int not null default 5060 comment '网关对下级端口',
    iupport              int not null default 6060 comment '网关对上级端口',
-   cUserName            varchar(40) comment '用户名',
-   cPassword            varchar(40) comment '密码',
+   ihttpport            int not null default 8080 comment '网关http监听端口',
    primary key (cGBID)
 );
 
@@ -78,7 +77,7 @@ create table media_svr_tbl
    iMediaType           int  not null default 0 comment '媒体类型（0--转发服务器，1--转码服务器）',
    cName                varchar(30) not null comment '流媒体名称',
    cIP                  varchar(40) not null comment '媒体流服务器IP地址',
-   iPort                int not null default 10050 comment '媒体流服务器端口：默认值554，范围(0,65535)',
+   iPort                int not null default 10050 comment '媒体流服务器端口：默认值10050，范围(0,65535)',
    cAccessDateTime      timestamp not null  comment '最近一次接入成功时间',
    primary key (iID)
 );
@@ -98,7 +97,7 @@ create table signalproxy_runing_status_tbl
    fMemUP               float(10) comment '内存使用率百分比',
    fDiskIOUP            float(10) comment '磁盘IO使用率百分比',
    fNetworkIOUP         float(10) comment '网络IO使用率百分比',
-   dtUpdate             timestamp comment '时间点',   
+   dtUpdate             timestamp not null comment '时间点',   
    primary key (iID)
 );
 
@@ -136,10 +135,10 @@ create table down_gb_platform_tbl
 (
    cGBID                varchar(20)  not null comment '下级国标编号',
    cIP                  varchar(40) not null comment '下级国标平台IP地址',
-   iPort                int not null comment '下级国标平台端口',
+   iPort                int not null default 5060 comment '下级国标平台端口',
    cUserName            varchar(40) not null comment '用户名',
    cPassword            varchar(40) not null comment '密码',
-   cPlatformVersion     varchar(40) not null comment '平台版本',
+   cPlatformVersion     varchar(40) not null comment '平台国标版本',
    iOnLine              int not null  default 0 comment '是否在线：0 - 异常, 1 - 在线',
    cAccessDateTime      timestamp not null   comment '下级国标平台最近一次接入时间',
    primary key (cGBID)
@@ -155,7 +154,7 @@ alter table down_gb_platform_tbl comment '下级国标平台参数';
 use gb_gateway_db;
 create table device_info_tbl
 (
-   device_gbid   		varchar(20) not null comment '设备国标编号',
+   device_gbid   		   varchar(20) not null comment '设备国标编号',
    device_source        int  not null  default 0 comment '设备来源  0 - 本机配置  1 - 下级推送',
    device_type          int  not null  default 132 comment '设备类型' , 
    device_name          varchar(128)   comment '设备名称',
@@ -165,7 +164,7 @@ create table device_info_tbl
    device_civilcode     varchar(20)    comment '行政区域',
    device_block         varchar(22)    comment '警区',
    device_address       varchar(128)   comment '安装地点',
-   device_parental      int            comment '是否有子设备 1--有 0--没有',
+   device_parental      int  not null default 0 comment '是否有子设备 1--有 0--没有',
    device_parentid      varchar(20)    comment '父设备/区域/系统ID',
    device_safetyway     int            comment '信令安全模式',
    device_registerway   int            comment '注册方式',
@@ -176,8 +175,36 @@ create table device_info_tbl
    device_status        int            comment '设备状态  0--不在线， 1--在线',
    device_longitude     double         comment '设备经度',
    device_latitude      double         comment '设备维度',
+   device_platformid    varchar(20)    comment '所属平台编号'，
    PRIMARY KEY  (device_gbid)
 );
 
-alter table device_info_tbl comment '设备参数信息表';
+alter table device_info_tbl comment '国标设备参数信息表';
 
+
+/*==============================================================*/
+/* Table: map_info_tbl                                          */
+/*==============================================================*/
+use gb_gateway_db;
+create table map_info_tbl
+(
+    map_id        varchar(20) not null comment '部门国标编号',
+    map_name      varchar(64) not null comment '部门名称',
+    map_parentid  varchar(20)    comment '父部门编号'
+    map_owner     varchar(20) not null comment '部门所属平台',
+);
+alter table map_info_tbl comment '下级部门表';
+
+
+/*==============================================================*/
+/* Table: catalogpush_tbl                                       */
+/*==============================================================*/
+use gb_gateway_db;
+create table catalogpush_tbl
+   (
+      catalogid   varchar(20) not null comment '目录编号,即设备/部门编号',
+      catalogtype int  not null default 0 comment '目录类型 0--设备类型 1--部门类型',
+      upplatform_tbl varchar(20) not null comment '上级平台编号',
+   );
+
+alter table catalogpush_tbl comment '目录推送关系表--b端插入，c端使用';
